@@ -2,8 +2,5 @@ pandas
 joblib
 scikit-learn
 tensorflow
-keras
-numpy
 matplotlib
 flask
-flask-cors
