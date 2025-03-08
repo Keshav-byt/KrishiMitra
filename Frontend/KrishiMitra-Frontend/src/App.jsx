@@ -1,12 +1,13 @@
 
 import './App.css'
+import Landing from "./Components/Landing.jsx";
 
 function App() {
 
 
   return (
     <div>
-        <h1 className={'text-red-600'}>Hello world </h1>
+        <Landing/>
     </div>
   )
 }
