@@ -1,7 +1,7 @@
-# Smart Agriculture 🌱🚜
+# KrishiMitra 🌱🚜
 
 ## Overview
-Smart Agriculture is an advanced system that leverages IoT and AI to optimize farming efficiency, monitor environmental conditions, and enhance crop yields. 
+KrishiMitra is an advanced system that leverages IoT and AI to optimize farming efficiency, monitor environmental conditions, and enhance crop yields. 
 
 ## Features
 - 🌡️ **Real-time monitoring** of soil moisture, temperature, and humidity
@@ -13,11 +13,11 @@ Smart Agriculture is an advanced system that leverages IoT and AI to optimize fa
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Keshav-byt/Smart-Agriculture.git
+   git clone https://github.com/Keshav-byt/KrishiMitra.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd Smart-Agriculture
+   cd KrishiMitra
    ```
 3. Install dependencies:
    ```bash
@@ -25,6 +25,9 @@ Smart Agriculture is an advanced system that leverages IoT and AI to optimize fa
    ```
 4. Run the application:
    ```bash
+   python preprocess.py
+   python train_soil_model
+   python train_weather_model
    python app.py
    ```
 
