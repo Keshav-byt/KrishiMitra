@@ -13,20 +13,84 @@ import traceback
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)  # Fixing logger name
+logger = logging.getLogger(__name__)
+
+# Import preprocessing and training modules
+import importlib.util
+import sys
+
+def import_module_from_file(file_path, module_name):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
 
 # Create Flask app
-app = Flask(__name__)  # Fixing app initialization
+app = Flask(__name__)
 CORS(app)
 
-# Model and Scaler Loading with Robust Error Handling
+# Get the current script directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+scripts_dir = current_dir
+project_root = os.path.dirname(current_dir)  # Go up one level from Scripts
+
 def load_models_and_scalers():
     models = {}
     scalers = {}
 
+    # Defining correct paths relative to project structure
+    soil_model_path = os.path.join(project_root, "Models", "Soil_Analysis", "soil_tabular_model.h5")
+    soil_scaler_path = os.path.join(project_root, "Models", "Soil_analysis", "scaler.pkl")
+    weather_model_path = os.path.join(project_root, "Models", "Weather_Forecast", "weather_model.h5")
+    weather_scaler_path = os.path.join(project_root, "Models", "Weather_Forecast", "scaler.pkl")
+    
+    preprocess_path = os.path.join(scripts_dir, "preprocess.py")
+    train_soil_path = os.path.join(project_root, "Models", "Soil_analysis", "train_soil_model.py")
+    train_weather_path = os.path.join(project_root, "Models", "Weather_Forecast", "train_weather_model.py")
+    
+    # Run preprocessing if necessary
+    if (not os.path.exists(soil_scaler_path) or 
+        not os.path.exists(os.path.join(project_root, "data", "soil", "X_train_scaled.csv"))):
+        logger.info("Running soil data preprocessing...")
+        try:
+            if os.path.exists(preprocess_path):
+                preprocess = import_module_from_file(preprocess_path, "preprocess")
+                logger.info("Soil preprocessing completed")
+            else:
+                logger.error(f"Preprocessing script not found at {preprocess_path}")
+        except Exception as e:
+            logger.error(f"Error in soil preprocessing: {e}")
+            logger.error(traceback.format_exc())
+    
+    # Run soil model training if necessary
+    if not os.path.exists(soil_model_path):
+        logger.info("Training soil model...")
+        try:
+            if os.path.exists(train_soil_path):
+                train_soil = import_module_from_file(train_soil_path, "train_soil")
+                logger.info("Soil model training completed")
+            else:
+                logger.error(f"Soil training script not found at {train_soil_path}")
+        except Exception as e:
+            logger.error(f"Error in soil model training: {e}")
+            logger.error(traceback.format_exc())
+    
+    # Run weather model training if necessary
+    if not os.path.exists(weather_model_path) or not os.path.exists(weather_scaler_path):
+        logger.info("Training weather model...")
+        try:
+            if os.path.exists(train_weather_path):
+                train_weather = import_module_from_file(train_weather_path, "train_weather")
+                logger.info("Weather model training completed")
+            else:
+                logger.error(f"Weather training script not found at {train_weather_path}")
+        except Exception as e:
+            logger.error(f"Error in weather model training: {e}")
+            logger.error(traceback.format_exc())
+
     try:
         # Soil Analysis Model
-        soil_model_path = "Models/Soil_Analysis/soil_tabular_model.h5"
         if os.path.exists(soil_model_path):
             models['soil'] = load_model(soil_model_path)
             logger.info(f"Soil analysis model loaded successfully from {soil_model_path}")
@@ -34,7 +98,6 @@ def load_models_and_scalers():
             logger.error(f"Soil model not found at {soil_model_path}")
 
         # Soil Analysis Scaler
-        soil_scaler_path = "Models/Soil_analysis/scaler.pkl"
         if os.path.exists(soil_scaler_path):
             scalers['soil'] = joblib.load(soil_scaler_path)
             logger.info(f"Soil scaler loaded successfully from {soil_scaler_path}")
@@ -42,7 +105,6 @@ def load_models_and_scalers():
             logger.error(f"Soil scaler not found at {soil_scaler_path}")
 
         # Weather Forecast Model
-        weather_model_path = "Models/Weather_Forecast/weather_model.h5"
         if os.path.exists(weather_model_path):
             models['weather'] = load_model(
                 weather_model_path, 
@@ -56,7 +118,6 @@ def load_models_and_scalers():
             logger.error(f"Weather model not found at {weather_model_path}")
 
         # Weather Scaler
-        weather_scaler_path = "Models/Weather_Forecast/scaler.pkl"
         if os.path.exists(weather_scaler_path):
             scalers['weather'] = joblib.load(weather_scaler_path)
             logger.info(f"Weather scaler loaded successfully from {weather_scaler_path}")
@@ -71,7 +132,6 @@ def load_models_and_scalers():
 
     return models, scalers
 
-# Load models and scalers at startup
 MODELS, SCALERS = load_models_and_scalers()
 
 @app.route("/", methods=["GET"])
@@ -89,7 +149,6 @@ def index():
 def soil_analysis():
     """Soil fertility analysis endpoint"""
     try:
-        # Validate model is loaded
         if 'soil' not in MODELS or 'soil' not in SCALERS:
             return jsonify({"error": "Soil analysis model not loaded"}), 500
 
@@ -133,7 +192,6 @@ def soil_analysis():
 def weather_prediction():
     """Weather prediction endpoint"""
     try:
-        # Validate model is loaded
         if 'weather' not in MODELS or 'weather' not in SCALERS:
             return jsonify({
                 "error": "Weather prediction model or scaler not loaded. Please ensure the weather model and scaler files are available."
@@ -141,14 +199,14 @@ def weather_prediction():
 
         # Extract features from request
         data = request.json
-        if isinstance(data, dict):  # If data is a dictionary, extract "data"
+        if isinstance(data, dict): 
             data = data.get("data", None)
-        elif isinstance(data, list):  # If it's a list, treat it as raw input
+        elif isinstance(data, list): 
             pass
         else:
             return jsonify({"error": "Invalid input format. Expected a JSON array or object."}), 400
 
-        # Validate the input size (check for 3 values)
+        # Validate the input size (checks for 3 values)
         if not data or len(data) != 3:
             return jsonify({
                 "error": f"Invalid input size. Expected a JSON array with exactly 3 values, but got {len(data)} values."
@@ -157,15 +215,13 @@ def weather_prediction():
         # Convert to numpy array and reshape to (1, 1, 3)
         input_array = np.array(data).reshape(1, 1, 3)
 
-        # Normalize input using the scaler (Ensure correct input format)
+        # Normalize input using the scaler
         scaled_features = SCALERS['weather'].transform(input_array.reshape(-1, 3))
         scaled_features = scaled_features.reshape(1, 1, 3)
 
         # Make prediction
         prediction = MODELS['weather'].predict(scaled_features)
 
-        # To avoid the ValueError, do not attempt to inverse transform directly if the feature count is mismatched
-        # Instead, just return the prediction result
         return jsonify({
             "predicted_temperature": float(prediction[0][0])
         }), 200
@@ -176,5 +232,5 @@ def weather_prediction():
         return jsonify({"error": "Internal server error during weather prediction"}), 500
 
 
-if __name__ == "__main__":  # Fixing app entry point
+if __name__ == "__main__":
     app.run(debug=True)
