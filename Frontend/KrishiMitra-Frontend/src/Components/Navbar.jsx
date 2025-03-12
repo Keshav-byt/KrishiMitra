@@ -1,7 +1,24 @@
 const Navbar=()=>{
     return (
-        <div className={'bg-zinc-950 text-white w-screen z-10 fixed top-0 py-5 px-6 rounded-lg flex items-center justify-between '}>
-            nav bar
+        <div className={'bg-gradient-to-b from-black text-white w-full z-10 fixed top-0 py-3.5 px-4 md:px-16 flex items-center justify-between'}>
+            <div className={'flex items-center gap-2'}>
+                <img
+                    className={'w-12 h-12 md:w-16 md:h-16'}
+                    src="https://i.ibb.co/V0zgCvRg/Krishi-Mitra.png" alt="KrishiMitra Logo"/>
+                <h1 className={'text-xl md:text-2xl font-medium'}>KrishiMitra</h1>
+            </div>
+            <div className={'flex items-center space-x-6 md:space-x-12'}>
+                <div className="group">
+                    <h1 className={'text-sm font-medium cursor-pointer transition-all duration-300 ease-in-out group-hover:text-green-500'}>
+                        Soil Analysis
+                    </h1>
+                </div>
+                <div className="group">
+                    <h1 className={'text-sm font-medium cursor-pointer transition-all duration-300 ease-in-out group-hover:text-green-500'}>
+                        Weather Prediction
+                    </h1>
+                </div>
+            </div>
         </div>
     )
 }
