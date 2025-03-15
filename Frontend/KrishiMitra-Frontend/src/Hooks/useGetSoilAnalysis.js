@@ -1,3 +1,5 @@
+import {toast} from 'react-hot-toast'
+
 const useGetSoilAnalysis=()=>{
     const API_BASE_URL = 'http://localhost:5000';
     const getSoilAnalysis = async (mineralValue) => {
@@ -11,7 +13,9 @@ const useGetSoilAnalysis=()=>{
             })
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Soil analysis failed. Please try again.');
+                const errorMessage=errorData.error || 'Soil analysis failed. Please try again.'
+                // toast.error(errorMessage)
+                throw new Error(errorMessage);
             }
             const data=await response.json();
             // console.log(data)
@@ -22,11 +26,13 @@ const useGetSoilAnalysis=()=>{
             }
             else{
                 console.log('Soil Fertility: Classification data is missing')
+                toast.error('Soil Fertility: Classification data is missing')
                 return "missing"
             }
         }
         catch(error){
             console.error('Soil analysis error:', error);
+            toast.error(''+ error)
         }
     }
     return getSoilAnalysis;

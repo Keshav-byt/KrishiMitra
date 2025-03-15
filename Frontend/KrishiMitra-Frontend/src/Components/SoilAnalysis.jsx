@@ -1,6 +1,7 @@
 import Navbar from "./Navbar.jsx";
 import {useState} from "react";
 import useGetSoilAnalysis from "../Hooks/useGetSoilAnalysis.js";
+import toast, {Toaster} from "react-hot-toast";
 
 const SoilAnalysis = () => {
     const [isAnswered, setIsAnswered] = useState(false);
@@ -24,7 +25,7 @@ const SoilAnalysis = () => {
 
     const [mineralValue, setMineralValue] = useState(
         soilMinerals.reduce((acc, mineral) => {
-            acc[mineral[1]] = 0;
+            acc[mineral[1]] = undefined;
             return acc;
         }, {})
     );
@@ -48,6 +49,7 @@ const SoilAnalysis = () => {
     return (
         <div className={'h-screen w-full flex flex-col items-center justify-center bg-[url("https://t3.ftcdn.net/jpg/02/57/58/20/360_F_257582025_LUf6zGRPA0x0OGaLFS1UJIgkRKrrZhAk.jpg")] bg-cover bg-center'}>
             <Navbar />
+            <Toaster/>
             <div className={'h-[70%] w-[53%] bg-gradient-to-br from-zinc-800/50 via-zinc-900/50 to-zinc-950/50 backdrop-blur-sm rounded-3xl border border-gray-500 p-10 flex flex-col items-center justify-between text-white'}>
                 <h1 className={'text-3xl font-medium mb-3'}>Soil Analysis</h1>
                 <div className={'flex items-center w-full h-[85%]'}>
@@ -76,18 +78,18 @@ const SoilAnalysis = () => {
                         {!isAnswered ? (
                             <>
                                 <img src="https://cdni.iconscout.com/illustration/free/thumb/free-searching-data-illustration-download-in-svg-png-gif-file-formats--no-content-yet-for-web-empty-states-pack-design-development-illustrations-3385493.png" alt="" />
-                                <h1 className={'px-12 text-sm font-medium'}>
-                                    Click on 'Get Fertility' To get the result
+                                <h1 className={'px-12 text-lg font-medium text-gray-400'}>
+                                    Click on <span className={'font-bold'}>Get Fertility</span> To get the results
                                 </h1>
                             </>
                         ) : (
                             <>
                                 {result === "Low" && <>
                                     <img
-                                        className={'h-[70%] rounded-full border-2 border-gray-500'}
+                                        className={'h-[65%] rounded-full border-2 border-gray-500'}
                                         src="https://i.ibb.co/chS3jHFr/DALL-E-2025-03-14-23-13-19-A-modern-stylized-digital-illustration-representing-low-soil-fertility-Th.webp"
-                                    alt="DALL-E-2025-03-14-23-13-19-A-modern-stylized-digital-illustration-representing-low-soil-fertility-Th"
-                                    border="0"
+                                        alt="DALL-E-2025-03-14-23-13-19-A-modern-stylized-digital-illustration-representing-low-soil-fertility-Th"
+                                        border="0"
                                     />
                                     <h1 className={' text-xl m-2 font-medium'}>Soil Fertility is :
                                         <span className={'font-bold text-red-700'}> Low</span>
@@ -97,29 +99,29 @@ const SoilAnalysis = () => {
                                 {result === "High" &&
                                     <>
                                         <img
-                                            className={'h-[70%] rounded-full border-2 border-gray-500'}
+                                            className={'h-[65%] rounded-full border-2 border-gray-500'}
                                             src="https://i.ibb.co/jPFVPC13/DALL-E-2025-03-14-23-13-13-A-modern-stylized-digital-illustration-representing-high-soil-fertility-T.webp"
                                             alt="DALL-E-2025-03-14-23-13-13-A-modern-stylized-digital-illustration-representing-high-soil-fertility-T"
                                             border="0"
-                                       />
+                                        />
                                         <h1 className={' text-xl m-2 font-medium'}>Soil Fertility is :
                                             <span className={'font-bold text-green-600'}> High</span>
                                         </h1>
                                     </>}
-                        {result === "missing" &&
-                            <>
-                                <img
-                                    className={'h-[70%] '}
-                                    src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-illustration-download-in-svg-png-gif-file-formats--missing-error-business-pack-illustrations-8019228.png?f=webp"
-                                    alt="DALL-E-2025-03-14-23-13-13-A-modern-stylized-digital-illustration-representing-high-soil-fertility-T"
-                                    border="0"
-                                />
-                                <h1 className={' text-xl m-2 font-medium'}>
-                                    Soil data is missing. Please enter all values.
-                                </h1>
-                            </>}
-                    </>
-                    )}
+                                {result === "missing" &&
+                                    <>
+                                        <img
+                                            className={'h-[65%] '}
+                                            src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-illustration-download-in-svg-png-gif-file-formats--missing-error-business-pack-illustrations-8019228.png?f=webp"
+                                            alt="DALL-E-2025-03-14-23-13-13-A-modern-stylized-digital-illustration-representing-high-soil-fertility-T"
+                                            border="0"
+                                        />
+                                        <h1 className={' text-xl m-2 font-medium'}>
+                                            Soil data is missing. Please enter all values.
+                                        </h1>
+                                    </>}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
